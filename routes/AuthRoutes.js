@@ -9,14 +9,20 @@ const {
     loginPatient,
     createFamily,
     createHealthpro,
-    loginHealthpro
+    loginHealthpro,
+    joinFamily,
+    createCaregiver,
+    loginCaregiver
 } = require('../controllers/AuthController');
 
 // Auth routes
-router.post('/patient/register', createPatient);
-router.post('/patient/login', loginPatient);
+router.post('/register', createPatient);
+router.post('/login', loginPatient);
 router.post('/family/create', createFamily);
 router.post('/healthpro/register', createHealthpro);
 router.post('/healthpro/login', loginHealthpro);
+router.post('/family/join', joinFamily);
+router.post('/caregiver/register', createCaregiver);
+router.post('/caregiver/login', loginCaregiver);
 
 module.exports = router;   

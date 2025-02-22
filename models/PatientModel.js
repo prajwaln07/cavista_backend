@@ -5,29 +5,37 @@ const PatientSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    email: {
+        type: String,
+        required: true,
+    },
     age: {
         type: Number
     },
-    family:{
-        type :mongoose.Schema.Types.ObjectId,
-        ref: 'FamilyModel',
-        required: true
-    },
-    familyRole:{
+    password: {
         type: String,
-        enum:["member","leader"],
         required: true
     },
-    caregiver:{
-        type :mongoose.Schema.Types.ObjectId,
+    family: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FamilyModel',
+        // type: String,
+        required: true
+    },
+    familyRole: {
+        type: String,
+        required: true
+    },
+    caregiver: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'CaregiverModel'
     },
-    disease:{
-        type :mongoose.Schema.Types.ObjectId,
+    disease: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'DiseaseModel'
     },
-    goals:{
-        type :mongoose.Schema.Types.ObjectId,
+    goals: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'GoalModel'
     },
 });
