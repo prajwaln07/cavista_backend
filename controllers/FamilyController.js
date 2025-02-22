@@ -1,89 +1,97 @@
-const family = require("../models/FamilyModel");
-const Patient = require("../models/PatientModel");
+const Family = require('../models/FamilyModel');
+const Patient = require('../models/PatientModel');
+const { generateToken } = require('../utils/tokenUtils');
 
-const addmember = async (req, res) => { 
-    try{
-        const {name,email,password, family} = req.body;
-        if(!name || !email || !password || !family){
-            return res.status(400).json({msg: "Please enter all fields"});
+const createFamily = async (req, res) => {
+    try {
+        const { name, houseid, password } = req.body;
+        
+        const existingFamily = await Family.findOne({ houseid });
+        if (existingFamily) {
+            return res.status(400).json({ msg: "House ID already exists" });
         }
-        const newPatient = new Patient({
+
+        const family = new Family({
+            name,
+            houseid,
+            password,
+            members: []
+        });
+
+        await family.save();
+        const token = generateToken(family);
+        res.status(201).json({ family, token });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+const addFamilyMember = async (req, res) => {
+    try {
+        const { familyId } = req.params;
+        const { name, email, password, role } = req.body;
+
+        const family = await Family.findById(familyId);
+        if (!family) {
+            return res.status(404).json({ msg: "Family not found" });
+        }
+
+        const patient = new Patient({
             name,
             email,
             password,
-            family
+            family: familyId,
+            familyRole: role || 'member'
         });
-        const savedPatient = await newPatient.save();
-        res.json(savedPatient);
-    }catch(err){
-        res.status(500).json({error: err.message});
-    }
-}
 
-const getFamily = async (req, res) => {
-    try{ 
-        const {id} = req.params;
-        const family = await Family.findById(id);
-        res.json(family);
-    }catch(err){
-        res.status(500).json({error: err.message});
+        await patient.save();
+        family.members.push(patient._id);
+        await family.save();
+
+        res.status(201).json(patient);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-}
+};
 
 const getFamilyMembers = async (req, res) => {
-    try{
-        const {id} = req.params;
-        const family = await Family.findById(id);
-        const members = await Patient.find({family: family.id});
-        res.json(members);
-    }catch(err){
-        res.status(500).json({error: err.message});
+    try {
+        const { familyId } = req.params;
+        const family = await Family.findById(familyId)
+            .populate('members', 'name email familyRole');
+        if (!family) {
+            return res.status(404).json({ msg: "Family not found" });
+        }
+        res.json(family.members);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-}
+};
 
-const getFamilyMemberById = async (req, res) => {
-    try{
-        const {id} = req.params;
-        const member = await Patient.findById(id);
-        res.json(member);
-    }catch(err){
-        res.status(500).json({error: err.message});
+const updateFamilyMemberRole = async (req, res) => {
+    try {
+        const { memberId } = req.params;
+        const { role } = req.body;
+
+        const patient = await Patient.findById(memberId);
+        if (!patient) {
+            return res.status(404).json({ msg: "Family member not found" });
+        }
+
+        patient.familyRole = role;
+        await patient.save();
+        res.json(patient);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-}
-
-const updateFamilyMember = async (req, res) => {
-    try{
-
-    }catch(err){
-        res.status(500).json({error: err.message});
-    }
-}
-
-const deleteFamilyMember = async (req, res) => {
-    try{
-       const {id} = req.params;
-       const member = await Patient.findById(id);
-         if(!member){
-              return res.status(400).json({msg: "Member does not exist"});
-         }
-       const memb = await member.delete();
-       if(!memb){
-           return res.status(400).json({msg: "Error deleting member"});
-       }
-       res.json({msg: "Member deleted"});
-    }catch(err){
-        res.status(500).json({error: err.message});
-    }
-}
+};
 
 module.exports = {
-    addmember,
-    getFamily,
+    createFamily,
+    addFamilyMember,
     getFamilyMembers,
-    getFamilyMemberById,
-    updateFamilyMember,
-    deleteFamilyMember
-}
+    updateFamilyMemberRole
+};
 
 
 

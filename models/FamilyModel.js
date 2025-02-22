@@ -13,11 +13,10 @@ const FamilySchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    memebers:{
-        type: Array[mongoose.Schema.Types.ObjectId],
-        ref: 'PatientModel',
-        required: true
-    }
+    members: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PatientModel'
+    }]
 });
 
 module.exports = mongoose.model('FamilyModel', FamilySchema);

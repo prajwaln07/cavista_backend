@@ -1,9 +1,7 @@
-const Patient = require('../models/Patient');
-const Family = require('../models/Family');
-const caregiver = require('../models/Caregiver');
-const Disease = require('../models/Disease');
-const Goal = require('../models/Goal');
-const Healthpro = require('../models/Healthpro');
+const Patient = require('../models/PatientModel');
+const Family = require('../models/FamilyModel');
+const Caregiver = require('../models/CaregiverModel');
+const Disease = require('../models/DiseaseModel');
 
 const getPatients = async (req, res) => {
     try{
@@ -21,8 +19,7 @@ const getPatientById = async (req, res) => {
         .findById(id)   
         .populate('family')
         .populate('caregiver')
-        .populate('disease')
-        .populate('goals');
+        .populate('disease');
         res.json(patient);
     }
     catch(err){
@@ -82,43 +79,11 @@ const createDisease = async (req, res) => {
     }
 }
 
-
-// const mongoose = require('mongoose');
-
-// const GoalsSchema = new mongoose.Schema({
-//     date:{
-//         type: Date,
-//         required: true
-//     },
-//     todos:{
-//         type: Array[mongoose.Schema.Types.ObjectId],
-//         ref: 'TodosModel',
-//         required: true
-//     },
-// });
-
-// const mongoose = require('mongoose');
-
-// const TodosSchema = new mongoose.Schema({  
-//     title: {
-//         type: String,
-//         required: true
-//     },
-//     description: {
-//         type: String,
-//         required: true
-//     },
-//     status:{
-//         type: String,
-//         enum:["pending","completed"],
-//         required: true  
-//     }
-// });
-
-
-// // according to above creategaol and todo  create and get all goals and todos
-
-// const addintoGoals = () => {
-     
-// }
+module.exports = {
+    getPatients,
+    getPatientById,
+    setCaregiver,
+    setDisease,
+    createDisease
+};
 

@@ -13,10 +13,10 @@ const HealthproSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    family:{
-        type: Array[mongoose.Schema.Types.ObjectId],
+    family: [{
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'FamilyModel'
-    }
+    }]
 });
 
 module.exports = mongoose.model('HealthproModel', HealthproSchema);

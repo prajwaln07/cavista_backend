@@ -1,16 +1,18 @@
 const mongoose = require('mongoose');
 
 const DiseaseSchema = new mongoose.Schema({
-    name:{
+    name: {
         type: String,
         required: true
     },
-    symptoms:{
-        type: Array,
+    symptoms: [{
+        type: String,
         required: true
-    },
-    treatments:{
-        type: Array,
+    }],
+    treatments: [{
+        type: String,
         required: true
-    }
+    }]
 });
+
+module.exports = mongoose.model('DiseaseModel', DiseaseSchema);

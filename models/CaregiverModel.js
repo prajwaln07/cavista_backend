@@ -13,9 +13,10 @@ const CaregiverSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    patients:{
-        type: Array[mongoose.Schema.Types.ObjectId],
-        ref: 'PatientModel',
-        required: true
-    }
+    patients: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'PatientModel'
+    }]
 });
+
+module.exports = mongoose.model('CaregiverModel', CaregiverSchema);

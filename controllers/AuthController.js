@@ -1,8 +1,7 @@
-const Patient = require('../models/Patient');
-const Family = require('../models/Family');
-const Healthpro = require('../models/Healthpro');
-const Caregiver = require('../models/Caregiver');
-const bycrypt = require('bcryptjs');
+const Patient = require('../models/PatientModel');
+const Family = require('../models/FamilyModel');
+const Healthpro = require('../models/HealthproModel');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const createjwttoken = async (user) => {
@@ -21,7 +20,7 @@ const createPatient = async (req, res) => {
          if(patient){
              return res.status(400).json({msg: "Patient already exists"});
           }
-          const hashedpassword = await bycrypt.hash(password, 10);
+          const hashedpassword = await bcrypt.hash(password, 10);
             const newPatient = new Patient({
                 name,
                 email,
@@ -56,7 +55,7 @@ const loginPatient = async (req, res) => {
         if(!patient){
             return res.status(400).json({msg: "Patient does not exist"});
         }
-        const isMatch = await bycrypt.compare(password, patient.password);
+        const isMatch = await bcrypt.compare(password, patient.hashedpassword);
         if(!isMatch){
             return res.status(400).json({msg: "Invalid credentials"});
         }
@@ -82,7 +81,7 @@ const createFamily = async (req, res) => {
        if(!name || !houseid || !password){
            return res.status(400).json({msg: "Please enter all fields"});
        }
-       const hashedpassword = await bycrypt.hash(password, 10);
+       const hashedpassword = await bcrypt.hash(password, 10);
          const family = await Family
          .findOne({houseid});
             if(family){
@@ -110,7 +109,7 @@ const createHealthpro = async (req, res) => {
             if(healthpro){
                 return res.status(400).json({msg: "Healthpro already exists"});
             }
-            const hashedpassword = await bycrypt.hash(password, 10);
+            const hashedpassword = await bcrypt.hash(password, 10);
                 const newHealthpro = new Healthpro({
                     name,
                     email,
@@ -127,7 +126,6 @@ const createHealthpro = async (req, res) => {
                         family: savedHealthpro.family
                     }
                 });
-                res.json(savedHealthpro);
     }catch(err){
         res.status(500).json({error: err.message});
     }
@@ -144,7 +142,7 @@ const loginHealthpro = async (req, res) => {
             return res.status(400).json({msg: "Healthpro does not exist"});
         }
         
-        const isMatch = await bycrypt.compare(password, healthpro.password);
+        const isMatch = await bcrypt.compare(password, healthpro.password);
         if(!isMatch){
             return res.status(400).json({msg: "Invalid credentials"});
         }
@@ -162,4 +160,12 @@ const loginHealthpro = async (req, res) => {
         res.status(500).json({error: err.message});
     }
 }
+
+module.exports = {
+    createPatient,
+    loginPatient,
+    createFamily,
+    createHealthpro,
+    loginHealthpro
+};
 
