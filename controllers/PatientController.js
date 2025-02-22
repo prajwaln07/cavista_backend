@@ -23,11 +23,18 @@ const getPatientById = async (req, res) => {
         const patient = await Patient
             .findById(id)
             .populate('family')
-            .populate('caregiver')
+            .populate({
+                path: 'caregiver',
+                select: 'name email contact specialization' // Only select needed fields
+            })
             .populate('disease');
+
+        if (!patient) {
+            return res.status(404).json({ msg: "Patient not found" });
+        }
+
         res.json(patient);
-    }
-    catch (err) {
+    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 }
