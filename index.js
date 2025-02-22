@@ -17,7 +17,7 @@ app.use('/api/auth', require('./routes/AuthRoutes'));
 app.use('/api/patients', require('./routes/patientRoutes'));
 app.use('/api/families', require('./routes/familyRoutes'));
 app.use('/api/healthpros', require('./routes/healthproRoutes'));
-// app.use('/api/caregivers', require('./routes/caregiverRoutes'));
+app.use('/api/caregivers', require('./routes/careGiverRoutes'));
 app.use('/api/appointments', require('./routes/appointmentRoutes'));
 app.use('/api/goals', require('./routes/goalRoutes'));
 // app.use('/api/todos', require('./routes/todoRoutes'));
