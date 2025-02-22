@@ -12,7 +12,7 @@ const GoalSchema = new mongoose.Schema({
     },
     todos: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'TodoModel'
+        ref: 'TodosModel'
     }]
 });
 

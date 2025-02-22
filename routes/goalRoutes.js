@@ -7,8 +7,20 @@ const {
     getPatientGoals
 } = require('../controllers/GoalController');
 
-router.post('/', auth, createGoal);
-router.put('/todo/:todoId', auth, updateTodoStatus);
-router.get('/patient/:patientId', auth, getPatientGoals);
+// Debug middleware
+router.use((req, res, next) => {
+    console.log('Goal Route Request:', {
+        method: req.method,
+        path: req.path,
+        headers: req.headers,
+        body: req.body,
+        params: req.params
+    });
+    next();
+});
+
+router.post('/', createGoal);
+router.put('/todo/:todoId', updateTodoStatus);
+router.get('/patient/:patientId', getPatientGoals);
 
 module.exports = router; 
