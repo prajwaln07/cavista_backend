@@ -4,7 +4,6 @@ const AppoinmentSchema = new mongoose.Schema({
     patientId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'PatientModel',
-        required: true
     },
     mainSymptoms: String,
     report: String,

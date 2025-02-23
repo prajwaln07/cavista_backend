@@ -74,7 +74,7 @@ async function getAIResponse(prompt) {
 
 const startAIConversation = async (req, res) => {
     try {
-        const { sessionId } = req.body;
+        const { sessionId} = req.body;
         if (!sessionId) {
             return res.status(400).json({ error: "Missing sessionId" });
         }
@@ -100,8 +100,8 @@ const startAIConversation = async (req, res) => {
 
 const processAIConversation = async (req, res) => {
     try {
-        const { sessionId, text } = req.body;
-
+        const { sessionId, text,patientId } = req.body;
+        console.log(text);
         if (!sessions[sessionId]) {
             return res.status(400).json({ error: "Session not found" });
         }
@@ -193,11 +193,10 @@ Keep it professional and concise.`;
 
                 // Create appointment without requiring patientId
                 const newAppointment = new Appointment({
+                    patientId: patientId,
                     mainSymptoms: session.data.symptoms.trim(),
                     report: reportText,
-                    date: session.data.appointmentDate,
-                    time: session.data.appointmentTime,
-                    status: "pending"
+                    appointmentDate: session.data.appointmentDate
                 });
 
                 await newAppointment.save();
