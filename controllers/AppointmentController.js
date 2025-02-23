@@ -20,7 +20,7 @@ Current conversation stage: {stage}
 
 Guidelines based on stage:
 - name_collection: 
-  Start warmly: "Hi! I'm Sarah from Cavista Healthcare. May I know your name?"
+  Start warmly: "Hi! May I know your name?"
 
 - symptoms_collection: 
   After getting name, say: "Hello [name], what health concerns bring you here today?"
@@ -74,13 +74,14 @@ async function getAIResponse(prompt) {
 
 const startAIConversation = async (req, res) => {
     try {
-        const { sessionId } = req.body;
+        const { sessionId} = req.body;
         if (!sessionId) {
             return res.status(400).json({ error: "Missing sessionId" });
         }
 
         sessions[sessionId] = {
             data: {
+                patientId: "",
                 symptoms: "",
                 appointmentDate: "",
                 stage: "name_collection",
@@ -100,8 +101,9 @@ const startAIConversation = async (req, res) => {
 
 const processAIConversation = async (req, res) => {
     try {
-        const { sessionId, text } = req.body;
-
+        const { sessionId, text, patientId } = req.body;
+        console.log("Processing conversation for session:", sessionId);
+        
         if (!sessions[sessionId]) {
             return res.status(400).json({ error: "Session not found" });
         }
@@ -162,9 +164,10 @@ const processAIConversation = async (req, res) => {
         const reply = await getAIResponse(prompt);
         session.conversation.push({ role: "assistant", content: reply });
 
-        if (session.data.stage === "report_generation") {
+        // Check if the reply indicates report generation
+        if (reply.includes("REPORT_READY") || session.data.stage === "report_generation") {
             try {
-                // Generate a structured report
+                console.log("Generating report...");
                 const reportPrompt = `Create a medical report from this conversation:
 ${conversationHistory}
 
@@ -190,31 +193,34 @@ Recommendations:
 Keep it professional and concise.`;
 
                 const reportText = await getAIResponse(reportPrompt);
+                console.log("Report generated:", reportText);
 
-                // Create appointment without requiring patientId
+                // Create appointment with proper date formatting
+                const [day, month, year] = session.data.appointmentDate.split('/');
+                const formattedDate = `${year}-${month}-${day}`;
+
                 const newAppointment = new Appointment({
+                    patientId: patientId,
                     mainSymptoms: session.data.symptoms.trim(),
                     report: reportText,
-                    date: session.data.appointmentDate,
-                    time: session.data.appointmentTime,
-                    status: "pending"
+                    appointmentDate: new Date(formattedDate)
                 });
 
-                await newAppointment.save();
-                console.log("Appointment saved:", newAppointment); // Debug log
+                const savedAppointment = await newAppointment.save();
+                console.log("Appointment saved:", savedAppointment);
 
                 delete sessions[sessionId];
 
                 return res.json({
                     reply: `Thank you. I've scheduled your appointment for ${session.data.appointmentDate} at ${session.data.appointmentTime}.`,
-                    reportGenerated: true,
-                    report: reportText
+                    report: reportText,
+                    appointmentId: savedAppointment._id
                 });
             } catch (error) {
                 console.error("Database error:", error);
-                return res.json({
-                    reply: "I apologize, but I encountered an error. Could you please try again?",
-                    reportGenerated: false
+                return res.status(500).json({
+                    error: "Failed to save appointment",
+                    details: error.message
                 });
             }
         }
