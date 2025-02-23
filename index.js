@@ -12,7 +12,6 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
-// Add routes with correct file names and paths
 app.use('/api/auth', require('./routes/AuthRoutes'));
 app.use('/api/patients', require('./routes/patientRoutes'));
 app.use('/api/families', require('./routes/familyRoutes'));

@@ -7,8 +7,8 @@ const {
     setCaregiver
 } = require('../controllers/HealthproController');
 
-router.get('/', auth, getHealthpros);
-router.get('/:id', auth, getHealthproById);
-router.post('/set-caregiver', auth, setCaregiver);
+router.get('/', getHealthpros);
+router.get('/:id', getHealthproById);
+router.post('/set-caregiver', setCaregiver);
 
 module.exports = router; 
